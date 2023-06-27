@@ -1,9 +1,6 @@
 # gnss-picker
 Codes for project that identifies earthquake onset in RT-GNSS data
 
-# gnss-picker
-Codes for project that identifies earthquake onset in RT-GNSS data
-
 DATA and FIGURES directories not included
 
 Code Workflow
