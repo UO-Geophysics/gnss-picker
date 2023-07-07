@@ -133,7 +133,7 @@ def make_large_unet_drop(fac,sr,ncomps = 3,winsize = 128):
     
     return model
 
-def my_3comp_data_generator(batch_size, x_data, n_data, meta_data, nan_array, sig_inds, noise_inds, sr, std, valid = False, nlen = 256, winsize = 128):
+def my_3comp_data_generator(batch_size, x_data, n_data, meta_data, nan_array, sig_inds, noise_inds, sr, std, valid = False, nlen = 256, winsize = 128): # NLEN MAYBE NOW 257?
    
     epsilon = 1e-6
     

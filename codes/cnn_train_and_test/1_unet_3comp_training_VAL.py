@@ -152,7 +152,7 @@ noise_train_inds = noiseinds[:int(0.9*len(noiseinds))] # try getting rid of sort
 # print(shuffle_meta.shape)
 # Replacing meta_data with shuffle_meta later in code 
 
-## Testing
+## Testing # CHANGE TO VALIDATION
 sig_test_inds = siginds[int(0.9*len(siginds)):] # grabs the back 10% (90% through the end) and sorts 
 noise_test_inds = noiseinds[int(0.9*len(noiseinds)):]
 
