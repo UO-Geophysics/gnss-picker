@@ -50,7 +50,8 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
                 # Make sure it's not one of the earthquake days
                     
                 if random_date in earthquake_days:
-                    print(str(random_date) + ' gets skipped - earthquake day')
+                    pass
+                    # print(str(random_date) + ' gets skipped - earthquake day')
                     
                 else:
                 
@@ -152,7 +153,8 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
 #                                 print('--------------------------')
                                 
                                 i += 1
-                                print('**--**--** Success: station ' + str(random_sta) + ' for ' + str(random_date) + '; ' + str(i) + '/' + str(int(samples_per_cpu)) + ' samples for CPU ' + str(cpu_number) + ' **--**--**')
+#                                 print(i)
+#                                 print('**--**--** Success: station ' + str(random_sta) + ' for ' + str(random_date) + '; ' + str(i) + '/' + str(int(samples_per_cpu)) + ' samples for CPU ' + str(cpu_number) + ' **--**--**')
                                 
                                 line = '%s\n'%(i)
                                 # print(line)
@@ -161,19 +163,24 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
 #                                 print('--------------------------')
                             
                             else:
-                                ('Station ' + str(random_sta) + ' for date ' + str(random_date) + ': not enough samples')
+                                # ('Station ' + str(random_sta) + ' for date ' + str(random_date) + ': not enough samples')
+                                pass
                         
                         except:
-                            print('Station ' + str(random_sta) + ' for date ' + str(random_date) + ': time pick failed')
+                            # print('Station ' + str(random_sta) + ' for date ' + str(random_date) + ': time pick failed')
+                            pass
                         
                     else:
-                        print('Date ' + str(random_date) + ' is not there for station ' + str(random_sta))
+                        # print('Date ' + str(random_date) + ' is not there for station ' + str(random_sta))
+                        pass
                 
             else:
-                print('Station ' + str(random_sta) + ' is not there')
+                # print('Station ' + str(random_sta) + ' is not there')
+                pass
                 
         except:
-            print('Unknown error: station ' + str(random_sta) + ' for date ' + str(random_date))
+            # print('Unknown error: station ' + str(random_sta) + ' for date ' + str(random_date))
+            pass
     
     w.close()
     
