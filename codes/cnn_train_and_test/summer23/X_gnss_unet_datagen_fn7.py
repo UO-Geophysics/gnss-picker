@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 from scipy import signal
 
-def make_large_unet_drop(fac, sr, ncomps = 3, winsize = 129):
+def make_large_unet_drop(fac, sr, ncomps = 3, winsize = 128):
     
     if ncomps == 1:
         input_layer = tf.keras.layers.Input(shape = (winsize, 2)) # 1 channel seismic data
@@ -53,7 +53,7 @@ def make_large_unet_drop(fac, sr, ncomps = 3, winsize = 129):
     
     return model
 
-def my_3comp_data_generator(batch_size, x_data, n_data, meta_data, nan_array, sig_inds, noise_inds, sr, std, valid = False, nlen = 257, winsize = 129):
+def my_3comp_data_generator(batch_size, x_data, n_data, meta_data, nan_array, sig_inds, noise_inds, sr, std, valid = False, nlen = 256, winsize = 128):
    
     epsilon = 1e-6
     
@@ -141,7 +141,7 @@ def my_3comp_data_generator(batch_size, x_data, n_data, meta_data, nan_array, si
         else: # If valid = False, we are training and only want to give the generator the training data and the targets
             yield(new_batch, new_batch_target)
             
-def real_data_generator(data, data_inds, meta_data, sr, std, nlen = 129): # Doesn't use a batch size - just uses the whole thing
+def real_data_generator(data, data_inds, meta_data, sr, std, nlen = 128): # Doesn't use a batch size - just uses the whole thing
    
     epsilon = 1e-6
     
