@@ -3,9 +3,9 @@
 """
 Created on Mon Aug  2 16:39:17 2021
 
-@author: sydneydybing
+@author: sydneydybing 
 """
-
+#Need to uncomment w lines and saving npy line
 def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_path, cpu_number, save_npy_path, save_npy_name, progress_report_path):
 
     # Pick first a random station from the list in the directory, then a random
@@ -24,7 +24,7 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
     
     earthquake_days = ['20190704', '20190705', '20190706', '20190707', '20190712', '20190716', '20190726', '20190822', '20190823', '20200604'] # Days with earthquakes in Ridgecrest sequence >M4.3
     
-    w = open(progress_report_path + 'CPU_' + str(cpu_number) + '_progress_report.txt', 'w')
+#     w = open(progress_report_path + 'CPU_' + str(cpu_number) + '_progress_report.txt', 'w')
     
     while i < samples_per_cpu:
         
@@ -80,8 +80,8 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
                         
                         try:
                             
-                            # The latest time in the array for which we could still get a 256 second sample
-                            latest_time = times[-257]
+                            # The latest time in the array for which we could still get a 255 second sample
+                            latest_time = times[-256]
                             # print('Latest time: ' + str(latest_time))
                             
                             start_time = random.choice(times)
@@ -90,7 +90,7 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
                             if start_time <= latest_time:
                                 # print('Good start time')
                                 
-                                end_time = start_time + 256 # 383 if one long noise section rather than 3
+                                end_time = start_time + 255 # 383 if one long noise section rather than 3
                                 # print('End time: ' + str(end_time))
                                 
                                 # Then grab the section of data and save it as its own mseed
@@ -98,7 +98,7 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
                                 # print(st_start_time)
                                 UTC_random_start_time = st_start_time + start_time
                                 # print(UTC_random_start_time)
-                                UTC_end_time = UTC_random_start_time + 256
+                                UTC_end_time = UTC_random_start_time + 255
                                 # print(UTC_end_time)
                                 
                                 # random_write_counter
@@ -137,7 +137,7 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
                                 
                                 comb_data = np.append(n_data, e_data)
                                 comb_data = np.append(comb_data, u_data) # Order: N, E, Z(U)
-#                                 print(comb_data.shape)
+                                print(comb_data.shape)
                                 
                                 # plt.figure()
                                 # plt.title(random_sta + '_' + random_date)
@@ -158,7 +158,7 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
                                 
                                 line = '%s\n'%(i)
                                 # print(line)
-                                w.write(line)
+#                                 w.write(line)
                                 
 #                                 print('--------------------------')
                             
@@ -182,7 +182,7 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
             # print('Unknown error: station ' + str(random_sta) + ' for date ' + str(random_date))
             pass
     
-    w.close()
+#     w.close()
     
     # Currently the picker fails if there's a day of data selected that has gaps I think   
     # Failure examples to look at: Station ACSX for date 20200213: time pick failed, Station BBDM for date 20190901: time pick failed
@@ -190,8 +190,7 @@ def noise_picker(stas, dates, samples_per_cpu, noise_data_path, write_sample_pat
     data_array = np.array(data_list)
     print(data_array.shape)
     
-    np.save(save_npy_path + 'CPU_' + str(cpu_number) + '_' + save_npy_name, data_array)
-    # np.save(save_npy_path + save_npy_name, data_array)
+#     np.save(save_npy_path + 'CPU_' + str(cpu_number) + '_' + save_npy_name, data_array)
     
     
     
