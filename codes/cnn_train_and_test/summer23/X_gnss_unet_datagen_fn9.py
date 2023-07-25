@@ -53,7 +53,7 @@ def make_large_unet_drop(fac, sr, ncomps = 3, winsize = 128):
     
     return model
 
-def my_3comp_data_generator(batch_size, x_data, n_data, meta_data, nan_array, sig_inds, noise_inds, sr, std, valid = False, nlen = 256, winsize = 128):
+def my_3comp_data_generator(batch_size, fq_data, noise_data, meta_data, nan_array, fq_inds, noise_inds, sr, std, valid = False, nlen = 256, winsize = 128):
    
     epsilon = 1e-6
     
@@ -64,15 +64,15 @@ def my_3comp_data_generator(batch_size, x_data, n_data, meta_data, nan_array, si
         
         # Begin by randomly selecting a starting index for the earthquake data batch. This is half the length of the full batch size because the standalone noise samples added later makes the full batch length. Then pick a random starting index for the first noise batch (to be added to the FakeQuakes data) and the second noise batch (which will be standalone).
 
-        start_of_data_batch = np.random.choice(len(sig_inds) - batch_size//2) 
-        start_of_noise_batch1 = np.random.choice(len(noise_inds) - batch_size//2) 
-        start_of_noise_batch2 = np.random.choice(len(noise_inds) - batch_size//2)
+        start_of_fqdata_batch = np.random.choice(len(fq_inds) - batch_size//2) 
+        start_of_noise_batch_tocomb = np.random.choice(len(noise_inds) - batch_size//2) 
+        start_of_noise_batch_alone = np.random.choice(len(noise_inds) - batch_size//2)
         
         # Then select the right range of indices from each dataset.
 
-        datainds = sig_inds[start_of_data_batch:start_of_data_batch + batch_size//2] 
-        noiseinds1 = noise_inds[start_of_noise_batch1:start_of_noise_batch1 + batch_size//2] 
-        noiseinds2 = noise_inds[start_of_noise_batch2:start_of_noise_batch2 + batch_size//2] 
+        fqinds = fq_inds[start_of_fqdata_batch:start_of_fqdata_batch + batch_size//2] 
+        noiseinds_tocomb = noise_inds[start_of_noise_batch_tocomb:start_of_noise_batch_tocomb + batch_size//2] 
+        noiseinds_alone = noise_inds[start_of_noise_batch_alone:start_of_noise_batch_alone + batch_size//2] 
         
         ### ----- Making the full batches of data and targets ----- ###
         
@@ -82,11 +82,11 @@ def my_3comp_data_generator(batch_size, x_data, n_data, meta_data, nan_array, si
         
         # The target array is then initialized by concatenating ones (earthquakes) or zeros (standalone noise) in the right shapes. batch_target is defined to make a structure that we can fill with Gaussians when we calculate the actual targets.
 
-        comp1 = np.concatenate((x_data[datainds, :nlen] + n_data[noiseinds1, :nlen], n_data[noiseinds2, :nlen])) # N   
-        comp2 = np.concatenate((x_data[datainds, nlen:2*nlen] + n_data[noiseinds1, nlen:2*nlen], n_data[noiseinds2, nlen:2*nlen])) # E
-        comp3 = np.concatenate((x_data[datainds, 2*nlen:] + n_data[noiseinds1, 2*nlen:], n_data[noiseinds2, 2*nlen:])) # Z
-        metacomp = np.concatenate((meta_data[datainds, :], nan_array[noiseinds2, :]))
-        target = np.concatenate((np.ones_like(datainds), np.zeros_like(noiseinds2)))
+        comp1 = np.concatenate((fq_data[fqinds, :nlen] + noise_data[noiseinds_tocomb, :nlen], noise_data[noiseinds_alone, :nlen])) # N   
+        comp2 = np.concatenate((fq_data[fqinds, nlen:2*nlen] + noise_data[noiseinds_tocomb, nlen:2*nlen], noise_data[noiseinds_alone, nlen:2*nlen])) # E
+        comp3 = np.concatenate((fq_data[fqinds, 2*nlen:] + noise_data[noiseinds_tocomb, 2*nlen:], noise_data[noiseinds_alone, 2*nlen:])) # Z
+        metacomp = np.concatenate((meta_data[fqinds, :], nan_array[noiseinds_alone, :]))
+        target = np.concatenate((np.ones_like(fqinds), np.zeros_like(noiseinds_alone)))
         batch_target = np.zeros((batch_size, nlen))
 
         # A new list of indices is created that matches the full batch size. This is randomly shuffled, and then these shuffled indices are used to shuffle the data, metadata, and targets the same way to make sure everything still matches.
