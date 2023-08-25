@@ -141,7 +141,7 @@ def my_3comp_data_generator(batch_size, fq_data, noise_data, meta_data, nan_arra
         else: # If valid = False, we are training and only want to give the generator the training data and the targets
             yield(new_batch, new_batch_target)
             
-def real_data_generator(data, data_inds, meta_data, sr, std, nlen = 128): # Doesn't use a batch size - just uses the whole thing
+def real_data_generator(data, meta_data, sr, std, nlen = 128): # Doesn't use a batch size - just uses the whole thing
    
     epsilon = 1e-6
     
