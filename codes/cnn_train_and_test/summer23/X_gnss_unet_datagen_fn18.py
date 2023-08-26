@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from scipy import signal
+import matplotlib.pyplot as plt
 
 def make_large_unet_drop(fac, sr, ncomps = 3, winsize = 128):
     
@@ -134,12 +135,27 @@ def my_3comp_data_generator(batch_size, fq_data, noise_data, meta_data, nan_arra
             new_batch_target[idx, :] = batch_target[idx, start:end]
     
         # Finally, we get a bunch of outputs depending on the options chosen in the beginning. New batch, as a reminder, is the final shifted data with shuffled noisy earthquakes and standalone noise. We also output the targets (either Gaussians or zeros aligning with the data in new_batch) and the associated metadata.
+        
+        # Normalizing the data samples again now that things are shifted and noisy
+        
+        new_batch_norm = np.zeros((batch_size, int(winsize*sr), 3))
+
+        for idx in range(len(new_batch)):
+            row = new_batch[idx]
+            comb = np.append(row[:,0], row[:,1])
+            comb = np.append(comb, row[:,2])
+            maximum = np.max(abs(comb))
+            comb_norm = comb/maximum
+            
+            new_batch_norm[idx, :, 0] = comb_norm[:winsize]
+            new_batch_norm[idx, :, 1] = comb_norm[winsize:2*winsize]
+            new_batch_norm[idx, :, 2] = comb_norm[2*winsize:]
 
         if valid: # If valid = True, we are testing and we want the metadata and original data for plotting/analysis
-            yield(new_batch, new_batch_target, metacomp)
+            yield(new_batch_norm, new_batch_target, metacomp)
             
         else: # If valid = False, we are training and only want to give the generator the training data and the targets
-            yield(new_batch, new_batch_target)
+            yield(new_batch_norm, new_batch_target)
             
 def real_data_generator(data, meta_data, sr, std, nlen = 128): # Doesn't use a batch size - just uses the whole thing
    
