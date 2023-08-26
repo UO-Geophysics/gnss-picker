@@ -152,7 +152,7 @@ def my_3comp_data_generator(batch_size, fq_data, noise_data, meta_data, nan_arra
             new_batch_norm[idx, :, 2] = comb_norm[2*winsize:]
 
         if valid: # If valid = True, we are testing and we want the metadata and original data for plotting/analysis
-            yield(new_batch_norm, new_batch_target, metacomp)
+            yield(new_batch, new_batch_norm, new_batch_target, metacomp)
             
         else: # If valid = False, we are training and only want to give the generator the training data and the targets
             yield(new_batch_norm, new_batch_target)
