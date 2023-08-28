@@ -157,7 +157,7 @@ def my_3comp_data_generator(batch_size, fq_data, noise_data, meta_data, nan_arra
         else: # If valid = False, we are training and only want to give the generator the training data and the targets
             yield(new_batch_norm, new_batch_target)
             
-def real_data_generator(data, meta_data, sr, std, nlen = 128): # Doesn't use a batch size - just uses the whole thing
+def real_data_generator(batch_size, data, meta_data, sr, std, nlen = 128): # Doesn't use a batch size - just uses the whole thing
    
     epsilon = 1e-6
     
@@ -166,9 +166,9 @@ def real_data_generator(data, meta_data, sr, std, nlen = 128): # Doesn't use a b
         ### ----- Making the full batches of data and targets ----- ###
         
         # DATA
-        comp1 = data[:, :nlen]
-        comp2 = data[:, nlen:2*nlen]
-        comp3 = data[:, 2*nlen:]
+        comp1 = data[:batch_size, :nlen]
+        comp2 = data[:batch_size, nlen:2*nlen]
+        comp3 = data[:batch_size, 2*nlen:]
         
         # TARGETS 
         
@@ -231,11 +231,26 @@ def real_data_generator(data, meta_data, sr, std, nlen = 128): # Doesn't use a b
             stack_data[ii, :, 1] = comp2[ii, :]
             stack_data[ii, :, 2] = comp3[ii, :]
             
+        # Normalizing the data samples
+        
+        new_batch_norm = np.zeros((batch_size, int(nlen*sr), 3))
+
+        for idx in range(len(stack_data)):
+            row = stack_data[idx]
+            comb = np.append(row[:,0], row[:,1])
+            comb = np.append(comb, row[:,2])
+            maximum = np.max(abs(comb))
+            comb_norm = comb/maximum
+            
+            new_batch_norm[idx, :, 0] = comb_norm[:nlen]
+            new_batch_norm[idx, :, 1] = comb_norm[nlen:2*nlen]
+            new_batch_norm[idx, :, 2] = comb_norm[2*nlen:]
+            
         ### ----- Creating batch_out ----- ###
         
         # batch_out = stack_data # The original real data, shape (12240, 128, 3)
         
-        yield(stack_data, gauss_target)
+        yield(stack_data, new_batch_norm, gauss_target)
 
 def main():
     make_large_unet(1,1,ncomps = 3)
