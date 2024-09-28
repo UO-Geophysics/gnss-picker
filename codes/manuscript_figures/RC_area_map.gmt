@@ -1,0 +1,53 @@
+#!/bin/bash
+
+gmt gmtset FORMAT_GEO_MAP = DDD.X
+range="-118.2/-117.1/35.45/36.076"
+inset_range="-125/-113/32/43"
+J="M6i"
+
+out="RC_area_eqfm_sta_map"
+
+# Cut the DEM to match the range for the figure
+gmt grdcut /Users/sydneydybing/DEM/dem.grd -Gstudyarea.grd -R$range -V
+
+# Get the elevation bounds
+gmt grdinfo studyarea.grd
+zmin=268.235412598
+zmax=2884.44848633
+
+# Make a gray color map and illuminate it
+gmt makecpt -D -Cgray.cpt -T0/$zmax/10 > studytopo.cpt
+gmt grdgradient studyarea.grd -A0/270 -Gtopogradient.grd -Ne0.4 -V
+
+# Plot the DEM
+gmt grdimage studyarea.grd -R$range -J$J -Cstudytopo.cpt -Q -Itopogradient.grd -P -B5 -Bg5 -Y5c -K > ${out}.eps
+
+gmt pscoast -R$range -J$J -Na -W0.5p,black -Df --FONT=15p -P -B0.5 -BNEsw -K -O >> ${out}.eps
+#gmt pscoast -R$range -J$J -Na -W0.5p,black -Df -O -K -Tdx1.5c/7c+w2.5c+f2+l,,,N -BNEsw --FONT=15p >> ${out}.eps
+gmt pscoast -R$range -J$J -Na -W0.5p,black -Df -O -K -Tdx13.7c/6.3c+w2.5c+f2+l,,,N -BNEsw --FONT=15p >> ${out}.eps
+
+gmt makecpt -D -Cred -T0/60/1 > color.cpt
+# awk -F, '{print $3,$2,$4,$5/10}' RC_4.3_quakes.csv | gmt psxy -R -J -Sc -Ccolor.cpt -W0.65p,black -O -K >> ${out}.eps
+gmt psmeca rc_scedc_focalmechs_only.txt -R -J -Gred -Sa0.7c -O -K >> ${out}.eps
+
+gmt psxy GNSS_stas_nolabel.txt -R$range -J$J -Si0.5c -Gblue -W0.3p,black -O -K >> ${out}.eps
+gmt pstext GNSS_stas.txt -R$range -J$J -D0/0.45 -F+f11,Arial-Bold,black -O -K >> ${out}.eps
+
+gmt set FONT_ANNOT_PRIMARY 15p,Arial
+gmt pslegend -R$range -J$J -F+gwhite -Dx0.25c/9c+w6c/1.45c -C0.4c/0.1c -O -K << EOF >> ${out}.eps
+# Legend
+# G is vertical gap, V is vertical line, N sets # of columns, D draws horizontal line.
+# H is header, L is label, S is symbol, T is paragraph text, M is map scale.
+N 1
+V 0 1p
+S 0i c 0.15i red1 0.25p 0.2i Earthquakes (M4.3+)
+S 0i i 0.5c blue3 0.25p 0.2i GNSS Stations
+EOF
+
+gmt pscoast -R$inset_range -JM4c -Na/0.5p,black -W0.5p,black -Df --FONT=12p -Gdarkseagreen1 -Slightskyblue1 -A1000 -X0.45c -Y0.45c -O -K >> ${out}.eps
+gmt psxy GNSS_stas_nolabel.txt -R$inset_range -JM4c -Sc0.08c -Gblue -O -K >> ${out}.eps
+gmt psbasemap -R$inset_range -JM4c -Ba6f6 -BNEsw -F+pred -D-118.2/-117.1/35.45/36.076 -O >> ${out}.eps
+
+gmt psconvert ${out}.eps -A -P -Tf
+
+open ${out}.pdf
