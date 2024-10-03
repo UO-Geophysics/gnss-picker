@@ -93,7 +93,12 @@ def my_3comp_data_generator(batch_size, fq_data, noise_data, meta_data, nan_arra
         # A new list of indices is created that matches the full batch size. This is randomly shuffled, and then these shuffled indices are used to shuffle the data, metadata, and targets the same way to make sure everything still matches.
 
         inds = np.arange(batch_size) 
-        np.random.shuffle(inds)  
+        np.random.shuffle(inds) 
+        
+#         print(inds.shape)
+#         print(comp1.shape)
+#         print(comp2.shape)
+#         print(comp3.shape)
         
         comp1 = comp1[inds, :] 
         comp2 = comp2[inds, :]
